@@ -1,6 +1,6 @@
 import AdministrationModel from '../models/administrationModel.js';
 
-// Get the newest administration record
+
 export const getNewestAdministration = async (req, res) => {
   try {
     const newestAdmin = await AdministrationModel.findOne().sort({ newDate: -1 });
@@ -15,7 +15,7 @@ export const getNewestAdministration = async (req, res) => {
 
 
 
-// Get typeMarche
+
 export const getTypeMarche = async (req, res) => {
   try {
     const newestAdmin = await AdministrationModel.findOne().sort({ newDate: -1 });
@@ -28,7 +28,7 @@ export const getTypeMarche = async (req, res) => {
   }
 };
 
-// Get categorieProduitMarche
+
 export const getCategorieProduitMarche = async (req, res) => {
   try {
     const newestAdmin = await AdministrationModel.findOne().sort({ newDate: -1 });
@@ -41,7 +41,7 @@ export const getCategorieProduitMarche = async (req, res) => {
   }
 };
 
-// Get produits
+
 export const getProduits = async (req, res) => {
   try {
     const newestAdmin = await AdministrationModel.findOne().sort({ newDate: -1 });
@@ -54,7 +54,7 @@ export const getProduits = async (req, res) => {
   }
 };
 
-// Get produitTarifsParkillo
+
 export const getProduitTarifsParkillo = async (req, res) => {
   try {
     const newestAdmin = await AdministrationModel.findOne().sort({ newDate: -1 });
@@ -67,7 +67,7 @@ export const getProduitTarifsParkillo = async (req, res) => {
   }
 };
 
-// Get typeDesVendeurs
+
 export const getTypeDesVendeurs = async (req, res) => {
   try {
     const newestAdmin = await AdministrationModel.findOne().sort({ newDate: -1 });
@@ -80,7 +80,7 @@ export const getTypeDesVendeurs = async (req, res) => {
   }
 };
 
-// Get typeDesProducteurs
+
 export const getTypeDesProducteurs = async (req, res) => {
   try {
     const newestAdmin = await AdministrationModel.findOne().sort({ newDate: -1 });
@@ -93,7 +93,7 @@ export const getTypeDesProducteurs = async (req, res) => {
   }
 };
 
-// Initialize the database with default administration data if empty
+
 export const initializeAdministration = async () => {
   try {
     const count = await AdministrationModel.countDocuments();
@@ -187,7 +187,7 @@ export const getAdministrationHistory = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-// Get products by category
+
 export const getProduitParCategorie = async (req, res) => {
   try {
     const { categorie } = req.body;

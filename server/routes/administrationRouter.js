@@ -11,32 +11,22 @@ import {
   getAdministrationHistory,
   getProduitParCategorie
 } from '../controllers/administrationController.js';
+import adminAuth from '../middleware/adminAuth.js';
 
 const administrationrouter = express.Router();
 
-// Get the newest administration record
+// Public read-only routes
 administrationrouter.get('/', getNewestAdministration);
-
 administrationrouter.get('/history', getAdministrationHistory);
-// Update administration record
-administrationrouter.post('/', updateAdministration);
-
-// Get typeMarche
 administrationrouter.get('/type-marche', getTypeMarche);
-administrationrouter.post('/produitparcategorie', getProduitParCategorie);
-// Get categorieProduitMarche
 administrationrouter.get('/categories-produits', getCategorieProduitMarche);
-
-// Get produits
 administrationrouter.get('/produits', getProduits);
-
-// Get produitTarifsParkillo
 administrationrouter.get('/tarifs-parkillo', getProduitTarifsParkillo);
-
-// Get typeDesVendeurs
 administrationrouter.get('/types-vendeurs', getTypeDesVendeurs);
-
-// Get typeDesProducteurs
 administrationrouter.get('/types-producteurs', getTypeDesProducteurs);
+
+// Protected admin routes
+administrationrouter.post('/', adminAuth, updateAdministration);
+administrationrouter.post('/produitparcategorie', adminAuth, getProduitParCategorie);
 
 export default administrationrouter;

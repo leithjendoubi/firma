@@ -1,30 +1,53 @@
 import jwt from "jsonwebtoken";
 
 const userAuth = async (req, res, next) => {
-  const { token } = req.cookies;
-
-  if (!token) {
-    return res.json({
-      success: false,
-      message: "Not Authorized. Logged In Again",
-    });
-  }
-
   try {
-    const tokenDecode = jwt.verify(token, process.env.JWT_SECRET);
+    const { token } = req.cookies;
 
-    if (tokenDecode.id) {
-      req.body.userId = tokenDecode.id;
-    } else {
-      return res.json({
+    if (!token) {
+      return res.status(401).json({
         success: false,
-        message: "Not Authorized. Logged In Again",
+        message: "Access denied. Please login to continue.",
       });
     }
 
+    // Verify JWT token
+    const tokenDecode = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (!tokenDecode.id) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid token. Please login again.",
+      });
+    }
+
+    // Add user info to request
+    req.body.userId = tokenDecode.id;
+    req.user = {
+      id: tokenDecode.id,
+      email: tokenDecode.email || null
+    };
+
     next();
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid token. Please login again."
+      });
+    }
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({
+        success: false,
+        message: "Token expired. Please login again."
+      });
+    }
+    
+    console.error('User auth error:', error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error during authentication."
+    });
   }
 };
 

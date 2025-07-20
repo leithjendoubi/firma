@@ -364,47 +364,53 @@ export const loginAdmin = async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.json({
+    return res.status(400).json({
       success: false,
       message: "Email and Password are required",
     });
   }
 
   try {
-    // Check if credentials match the admin credentials from .env
+    // Verify admin credentials
     if (
-      email !== process.env.ADMIN_EMAIL || 
+      email !== process.env.ADMIN_EMAIL ||
       password !== process.env.ADMIN_PASSWORD
     ) {
-      return res.json({ 
-        success: false, 
-        message: "Invalid admin credentials" 
+      return res.status(401).json({
+        success: false,
+        message: "Invalid admin credentials",
       });
     }
 
-    // Create a token (you might want to create a separate admin token)
-    const token = jwt.sign(
-      { id: "admin", isAdmin: true }, 
-      process.env.JWT_SECRET, 
+    // Create admin token with proper payload
+    const adminToken = jwt.sign(
+      {
+        email: process.env.ADMIN_EMAIL,
+        isAdmin: true,
+        role: 'admin'
+      },
+      process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
 
-    res.cookie("adminToken", token, {
+    // Set secure cookie for admin
+    res.cookie("adminToken", adminToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
 
     return res.json({ 
       success: true, 
-      message: "Admin login successful" 
+      message: "Admin login successful",
+      token: adminToken // Also return token for header-based auth
     });
-
   } catch (error) {
-    return res.json({ 
+    console.error('Admin login error:', error);
+    return res.status(500).json({ 
       success: false, 
-      message: error.message 
+      message: "Internal server error during admin login" 
     });
   }
 };

@@ -1,30 +1,41 @@
 import express from "express";
 import {
-  isAuthenticated,
+  register,
   login,
   logout,
-  register,
-  resetPassword,
-  sendResetOtp,
   sendVerifyOtp,
   verifyEmail,
+  isAuthenticated,
+  sendResetOtp,
+  resetPassword,
   addPhoto,
   loginAdmin,
 } from "../controllers/authController.js";
 import userAuth from "../middleware/userAuth.js";
-import upload from "../middleware/multer.js";
+import { 
+  validateRegistration, 
+  validateLogin, 
+  validateEmail, 
+  validateOTP, 
+  validatePasswordReset 
+} from "../middleware/validation.js";
+import { validateAdminLogin } from "../middleware/adminAuth.js";
+import { authRateLimit, registerRateLimit } from "../middleware/security.js";
 
 const authRouter = express.Router();
 
-authRouter.post("/register", register);
-authRouter.post('/admin/login', loginAdmin);
-authRouter.post("/login", login);
+// Public routes with validation and rate limiting
+authRouter.post("/register", registerRateLimit, validateRegistration, register);
+authRouter.post("/login", authRateLimit, validateLogin, login);
+authRouter.post("/admin-login", authRateLimit, validateAdminLogin, loginAdmin);
 authRouter.post("/logout", logout);
+authRouter.post("/send-reset-otp", authRateLimit, sendResetOtp);
+authRouter.post("/reset-password", authRateLimit, validatePasswordReset, resetPassword);
+
+// Protected routes with validation
 authRouter.post("/send-verify-otp", userAuth, sendVerifyOtp);
-authRouter.post("/verify-account", userAuth, verifyEmail);
+authRouter.post("/verify-account", userAuth, validateOTP, verifyEmail);
 authRouter.get("/is-auth", userAuth, isAuthenticated);
-authRouter.post("/send-reset-otp", sendResetOtp);
-authRouter.post("/reset-password", resetPassword);
-authRouter.post('/:userId/photo', upload.single('photo'), addPhoto);
+authRouter.post("/add-photo", userAuth, addPhoto);
 
 export default authRouter;
